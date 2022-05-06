@@ -8,6 +8,8 @@ def get_article_text(article):
     article_url = f'{fincult}/item/{article}'
     response = ses.get(article_url)
 
+    start_url = 'https://fincult.info/'
+
     if response.status_code == 200:
         of = open(f'.\{article}.txt', 'w')
         data = response.json()
@@ -17,6 +19,14 @@ def get_article_text(article):
             if el["code"] == "text":
                 of.write(el["data"]["title"]  + '\n')
                 of.write(el["data"]["text"].replace('\xd7', '') + '\n')
+                image = el["data"].get("image")
+                if image != None:
+                    src = image["file"]["src"]
+                    p = requests.get(f'{start_url}{src}')
+                    # руками создать папку img в папке с проектом
+                    out = open(f'.\img\{src.replace("/", "_")}', 'wb')
+                    out.write(p.content)
+                    out.close()
         of.close()
 
 
