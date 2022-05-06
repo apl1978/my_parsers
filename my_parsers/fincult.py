@@ -4,12 +4,11 @@ fincult = 'https://fincult.info/api/v1/articles'
 ses = requests.Session()
 
 
-def replase_non_printed_char(str):
+def replase_non_printed_char(i_str):
     non_printed_chars = ['\u200b', '\xd7']
     for char in non_printed_chars:
-        str = str.replace(char, '')
-    return str
-
+        i_str = i_str.replace(char, '')
+    return i_str
 
 def get_article_text(article):
     article_url = f'{fincult}/item/{article}'
@@ -35,9 +34,11 @@ def get_article_text(article):
                     src = image["file"]["src"]
                     p = requests.get(f'{start_url}{src}')
                     # руками создать папку img в папке с проектом
-                    out = open(f'.\img\{src.replace("/", "_")}', 'wb')
+                    img_path = f'.\img\{src.replace("/", "_")}'
+                    out = open(img_path, 'wb')
                     out.write(p.content)
                     out.close()
+                    of.write(img_path + '\n')
         of.close()
 
 
