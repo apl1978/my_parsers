@@ -4,6 +4,13 @@ fincult = 'https://fincult.info/api/v1/articles'
 ses = requests.Session()
 
 
+def replase_non_printed_char(str):
+    non_printed_chars = ['\u200b', '\xd7']
+    for char in non_printed_chars:
+        str = str.replace(char, '')
+    return str
+
+
 def get_article_text(article):
     article_url = f'{fincult}/item/{article}'
     response = ses.get(article_url)
@@ -13,12 +20,16 @@ def get_article_text(article):
     if response.status_code == 200:
         of = open(f'.\{article}.txt', 'w')
         data = response.json()
-        of.write(data["name"] + '\n')
-        of.write(data["description"].replace('\u200b', '') + '\n')
+        name = replase_non_printed_char(data["name"])
+        of.write(name + '\n')
+        description = replase_non_printed_char(data["description"])
+        of.write(description + '\n')
         for el in data["content"]:
             if el["code"] == "text":
-                of.write(el["data"]["title"]  + '\n')
-                of.write(el["data"]["text"].replace('\xd7', '') + '\n')
+                data_title = replase_non_printed_char(el["data"]["title"])
+                of.write(data_title + '\n')
+                data_text = replase_non_printed_char(el["data"]["text"])
+                of.write(data_text + '\n')
                 image = el["data"].get("image")
                 if image != None:
                     src = image["file"]["src"]
@@ -43,5 +54,6 @@ def get_articles():
                 break
             get_article_text(article["code"])
             count += 1
+
 
 get_articles()
